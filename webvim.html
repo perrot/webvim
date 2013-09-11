@@ -1,0 +1,690 @@
+<!doctype html>
+
+<title>webvim</title>
+<meta charset="utf-8"/>
+<link rel="stylesheet" href="lib/jquery/jquery-ui.css" />
+<script src="lib/jquery/jquery-1.9.1.js"></script>
+<script src="lib/jquery/jquery-ui.js"></script>
+
+<link rel=stylesheet href="lib/codemirror/doc/docs.css">
+
+<link rel="stylesheet" href="lib/codemirror/lib/codemirror.css">
+<link rel="stylesheet" href="lib/codemirror/addon/dialog/dialog.css">
+<link rel="stylesheet" href="lib/codemirror/theme/3024-day.css">
+<link rel="stylesheet" href="lib/codemirror/theme/3024-night.css">
+<link rel="stylesheet" href="lib/codemirror/theme/ambiance.css">
+<link rel="stylesheet" href="lib/codemirror/theme/base16-dark.css">
+<link rel="stylesheet" href="lib/codemirror/theme/base16-light.css">
+<link rel="stylesheet" href="lib/codemirror/theme/blackboard.css">
+<link rel="stylesheet" href="lib/codemirror/theme/cobalt.css">
+<link rel="stylesheet" href="lib/codemirror/theme/eclipse.css">
+<link rel="stylesheet" href="lib/codemirror/theme/elegant.css">
+<link rel="stylesheet" href="lib/codemirror/theme/erlang-dark.css">
+<link rel="stylesheet" href="lib/codemirror/theme/lesser-dark.css">
+<link rel="stylesheet" href="lib/codemirror/theme/midnight.css">
+<link rel="stylesheet" href="lib/codemirror/theme/monokai.css">
+<link rel="stylesheet" href="lib/codemirror/theme/neat.css">
+<link rel="stylesheet" href="lib/codemirror/theme/night.css">
+<link rel="stylesheet" href="lib/codemirror/theme/paraiso-dark.css">
+<link rel="stylesheet" href="lib/codemirror/theme/paraiso-light.css">
+<link rel="stylesheet" href="lib/codemirror/theme/rubyblue.css">
+<link rel="stylesheet" href="lib/codemirror/theme/solarized.css">
+<link rel="stylesheet" href="lib/codemirror/theme/the-matrix.css">
+<link rel="stylesheet" href="lib/codemirror/theme/tomorrow-night-eighties.css">
+<link rel="stylesheet" href="lib/codemirror/theme/twilight.css">
+<link rel="stylesheet" href="lib/codemirror/theme/vibrant-ink.css">
+<link rel="stylesheet" href="lib/codemirror/theme/xq-dark.css">
+<link rel="stylesheet" href="lib/codemirror/theme/xq-light.css">
+<link rel="stylesheet" href="lib/codemirror/addon/hint/show-hint.css">
+
+<script src="lib/codemirror/lib/codemirror.js"></script>
+<script src="lib/codemirror/addon/fold/foldcode.js"></script>
+<script src="lib/codemirror/addon/fold/foldgutter.js"></script>
+<script src="lib/codemirror/addon/fold/brace-fold.js"></script>
+<script src="lib/codemirror/addon/fold/xml-fold.js"></script>
+<script src="lib/codemirror/addon/fold/comment-fold.js"></script>
+<script src="lib/codemirror/addon/dialog/dialog.js"></script>
+<script src="lib/codemirror/addon/search/searchcursor.js"></script>
+<script src="lib/codemirror/mode/clike/clike.min.js"></script>
+<script src="lib/codemirror/addon/hint/javascript-hint.js"></script>
+<script src="lib/codemirror/addon/hint/python-hint.js"></script>
+<script src="lib/codemirror/addon/hint/show-hint.js"></script>
+<script src="lib/codemirror/mode/xml/xml.js"></script>
+<script src="lib/codemirror/mode/javascript/javascript.js"></script>
+<script src="lib/codemirror/mode/css/css.js"></script>
+<script src="lib/codemirror/mode/vbscript/vbscript.js"></script>
+<script src="lib/codemirror/mode/htmlmixed/htmlmixed.js"></script>
+<script src="lib/codemirror/mode/python/python.js"></script>
+<script src="lib/codemirror/keymap/vim.js"></script>
+<script src="lib/codemirror/keymap/extra.js"></script>
+<script src="lib/codemirror/addon/selection/active-line.js"></script>
+<script src="lib/codemirror/addon/edit/matchbrackets.js"></script>
+
+<style type="text/css">
+  #dialog label, #dialog input { display:block; }
+  #dialog label { margin-top: 0.5em; }
+  #dialog input, #dialog textarea { width: 95%; }
+  #tabs { margin-top: 1em; }
+  #tabs li .ui-icon-close { float: left; margin: 0.4em 0.2em 0 0; cursor: pointer; }
+  #add_tab { cursor: pointer; }
+
+ #toolbar {
+    padding: 4px;
+    display: inline-block;
+}
+  /* support: IE7 */
+  *+html #toolbar {
+    display: inline;
+  }
+
+      .CodeMirror {border-top: 1px solid #eee; border-bottom: 1px solid #eee;}
+      .CodeMirror-foldmarker {
+        color: blue;
+        text-shadow: #b9f 1px 1px 2px, #b9f -1px -1px 2px, #b9f 1px -1px 2px, #b9f -1px 1px 2px;
+        font-family: arial;
+        line-height: .3;
+        cursor: pointer;
+      }
+      .CodeMirror-foldgutter {
+        width: .7em;
+      }
+      .CodeMirror-foldgutter-open,
+      .CodeMirror-foldgutter-folded {
+        color: #555;
+        cursor: pointer;
+      }
+      .CodeMirror-foldgutter-open:after {
+        content: "\25BE";
+      }
+      .CodeMirror-foldgutter-folded:after {
+        content: "\25B8";
+      }
+     #files{
+     display:none;
+     }
+    </style>
+  <script>
+  $(function() {
+  });
+  </script>
+
+
+<article>
+<h2>webvim</h2>
+<div id="dialog" title="Tab data">
+  <form>
+    <fieldset class="ui-helper-reset">
+      <label for="tab_title">Title</label>
+      <input type="text" name="tab_title" id="tab_title" value="" class="ui-widget-content ui-corner-all" />
+      <label for="tab_content">Content</label>
+      <textarea name="tab_content" id="tab_content" class="ui-widget-content ui-corner-all"></textarea>
+    </fieldset>
+  </form>
+</div>
+ 
+<button id="add_tab">Test</button>
+
+<div id="toolbar" class="ui-widget-header ui-corner-all">
+  <span id="file">
+	  <button id="open">Open...</button>
+	  <button id="new">New</button>
+	  <button id="save">Save</button>
+  </span>
+  <span id="tabSet">
+	  <button id="opentab">Open Tab...</button>
+	  <button id="newtab">New Tab</button>
+  </span>
+  <span id="edit">
+	  <button id="undo">Undo</button>
+	  <button id="redo">Redo</button>
+  </span>
+  <span id="themeSet">
+    <button id="theme">Select a theme</button>
+    <button id="select">Select a theme</button>
+  </span>
+  <ul id="themeList">
+    <li><a href="#">default</a></li>
+    <li><a href="#">3024-day</a></li>
+    <li><a href="#">3024-night</a></li>
+  </ul>
+  </div>
+
+<input type="file" id="files" name="file" onchange="readBlob(null,null)"/>
+<!--
+<p>Select a theme: <select onchange="selectTheme()" id=select>
+    <option selected>default</option>
+    <option>3024-day</option>
+    <option>3024-night</option>
+    <option>ambiance</option>
+    <option>base16-dark</option>
+    <option>base16-light</option>
+    <option>blackboard</option>
+    <option>cobalt</option>
+    <option>eclipse</option>
+    <option>elegant</option>
+    <option>erlang-dark</option>
+    <option>lesser-dark</option>
+    <option>midnight</option>
+    <option>monokai</option>
+    <option>neat</option>
+    <option>night</option>
+    <option>paraiso-dark</option>
+    <option>paraiso-light</option>
+    <option>rubyblue</option>
+    <option>solarized dark</option>
+    <option>solarized light</option>
+    <option>the-matrix</option>
+    <option>tomorrow-night-eighties</option>
+    <option>twilight</option>
+    <option>vibrant-ink</option>
+    <option>xq-dark</option>
+    <option>xq-light</option>
+</select>
+</p>
+-->
+<div id="tabs">
+  <ul>
+  <!--
+    <li><a id="labels-1" href="#tabs-1" onclick="selectLabel(this)">[No Name]</a> <span class="ui-icon ui-icon-close" role="presentation">Remove Tab</span></li>
+    -->
+  </ul>
+  <!--
+  <div id="tabs-1" style="padding:0">
+<textarea id="code-a" name="code">
+function getCompletions(token, context) {
+  var found = [], start = token.string;
+  function maybeAdd(str) {
+    if (str.indexOf(start) == 0) found.push(str);
+  }
+  function gatherCompletions(obj) {
+    if (typeof obj == "string") forEach(stringProps, maybeAdd);
+    else if (obj instanceof Array) forEach(arrayProps, maybeAdd);
+    else if (obj instanceof Function) forEach(funcProps, maybeAdd);
+    for (var name in obj) maybeAdd(name);
+  }
+
+  if (context) {
+    // If this is a property, see if it belongs to some object we can
+    // find in the current environment.
+    var obj = context.pop(), base;
+    if (obj.className == "js-variable")
+      base = window[obj.string];
+    else if (obj.className == "js-string")
+      base = "";
+    else if (obj.className == "js-atom")
+      base = 1;
+    while (base != null && context.length)
+      base = base[context.pop().string];
+    if (base != null) gatherCompletions(base);
+  }
+  else {
+    // If not, just look in the window object and any local scope
+    // (reading into JS mode internals to get at the local variables)
+    for (var v = token.state.localVars; v; v = v.next) maybeAdd(v.name);
+    gatherCompletions(window);
+    forEach(keywords, maybeAdd);
+  }
+  return found;
+}
+
+</textarea>
+  </div>
+  -->
+</div>
+<!--
+<form><textarea id="code1" name="code">
+function getCompletions(token, context) {
+  var found = [], start = token.string;
+  function maybeAdd(str) {
+    if (str.indexOf(start) == 0) found.push(str);
+  }
+  function gatherCompletions(obj) {
+    if (typeof obj == "string") forEach(stringProps, maybeAdd);
+    else if (obj instanceof Array) forEach(arrayProps, maybeAdd);
+    else if (obj instanceof Function) forEach(funcProps, maybeAdd);
+    for (var name in obj) maybeAdd(name);
+  }
+
+  if (context) {
+    // If this is a property, see if it belongs to some object we can
+    // find in the current environment.
+    var obj = context.pop(), base;
+    if (obj.className == "js-variable")
+      base = window[obj.string];
+    else if (obj.className == "js-string")
+      base = "";
+    else if (obj.className == "js-atom")
+      base = 1;
+    while (base != null && context.length)
+      base = base[context.pop().string];
+    if (base != null) gatherCompletions(base);
+  }
+  else {
+    // If not, just look in the window object and any local scope
+    // (reading into JS mode internals to get at the local variables)
+    for (var v = token.state.localVars; v; v = v.next) maybeAdd(v.name);
+    gatherCompletions(window);
+    forEach(keywords, maybeAdd);
+  }
+  return found;
+}
+
+</textarea></form>
+-->
+
+    <script>
+    $( "#open" ).button({
+      text: false,
+      icons: {
+        primary: "ui-icon-folder-open"
+      }
+    });
+    $( "#newtab" ).button({
+      text: false,
+      icons: {
+        primary: "ui-icon-newwin"
+      }
+    })
+    .click(function() {
+    addTab();
+        //alert( "Running the last action" );
+      });
+    $( "#opentab" ).button({
+      text: false,
+      icons: {
+        primary: "ui-icon-mail-open"
+      }
+    })
+    .click(function() {
+    openTab();
+        //alert( "Running the last action" );
+      });
+    $( "#new" ).button({
+      text: false,
+      icons: {
+        primary: "ui-icon-document"
+      }
+    })
+    .click(function() {
+    editNew();
+        //alert( "Running the last action" );
+      });
+
+    $( "#save" ).button({
+      text: false,
+      icons: {
+        primary: "ui-icon-disk"
+      }
+    });
+    $( "#undo" ).button({
+      text: false,
+      icons: {
+        primary: "ui-icon-arrowreturnthick-1-w"
+      }
+    });
+    $( "#redo" ).button({
+      text: false,
+      icons: {
+        primary: "ui-icon-arrowreturnthick-1-e"
+      }
+    });
+    $( "#theme" )
+      .button({
+          text: false,
+          icons: {
+            primary: "ui-icon-image"
+          }
+      })
+      .click(function() {
+        //alert( "Running the last action" );
+      })
+      .next()
+        .button({
+          text: false,
+          icons: {
+            primary: "ui-icon-triangle-1-s"
+          }
+        })
+        .click(function() {
+          var menu = $( this ).parent().next().show().position({
+            my: "left top",
+            at: "left bottom",
+            of: this
+          });
+          $( document ).one( "click", function() {
+            menu.hide();
+          });
+          return false;
+        })
+        .parent()
+          .buttonset()
+          .next()
+            .hide()
+            .menu();
+    
+    $( "#file" ).buttonset();
+    $( "#edit" ).buttonset();
+    $("#themeSet").buttonset();
+    $("#tabSet").buttonset();
+    $("#theme").attr("disabled",true);
+    //tab section start
+  var tabTitle = $( "#tab_title" ),
+      tabContent = $( "#tab_content" ),
+      tabTemplate = "<li><a id='#{labelid}' href='#{href}' onclick='selectLabel(this)'>#{label}</a> <span class='ui-icon ui-icon-close' role='presentation'>Remove Tab</span></li>",
+      tabCounter = 1;
+ 
+    var tabs = $( "#tabs" ).tabs();
+ 
+    // modal dialog init: custom buttons and a "close" callback reseting the form inside
+    var dialog = $( "#dialog" ).dialog({
+      autoOpen: false,
+      modal: true,
+      buttons: {
+        Add: function() {
+          addTab();
+          $( this ).dialog( "close" );
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      },
+      close: function() {
+        form[ 0 ].reset();
+      }
+    });
+ 
+    // addTab form: calls addTab function on submit and closes the dialog
+    var form = dialog.find( "form" ).submit(function( event ) {
+      addTab();
+      dialog.dialog( "close" );
+      event.preventDefault();
+    });
+
+    var currentLabel=$("#labels-1");
+    function selectLabel(obj){
+	console.log("==== {{{selectLabel ====");
+        console.log("select label:"+obj.id);
+	console.log(editor);
+	editor=editors["code-"+String.fromCharCode(parseInt(obj.id.substring(obj.id.indexOf('-')+1))+96)]
+    	currentLabel=$("#"+obj.id);
+	console.log(currentLabel);
+	console.log(currentLabel.text());
+	console.log($("#labels-1"));
+	console.log($("#labels-2"));
+	console.log("==== selectLabel}}} ====");
+    }
+    
+    function openTab(){
+    	addTab();
+	$("#files").click();
+    }
+    function editNew(){
+	editor.doc.setValue('');
+    }
+ 
+    // actual addTab function: adds new tab using the input from the form above
+    function addTab() {
+      var label = "[No Name]",//tabTitle.val() || "Tab " + tabCounter,
+        id = "tabs-" + tabCounter,
+        li = $( tabTemplate.replace( /#\{href\}/g, "#" + id ).replace( /#\{label\}/g, label ).replace( /#\{labelid\}/g, "labels-"+tabCounter ) ),
+        tabContentHtml = "";//tabContent.val() || "Tab " + tabCounter + " content.";
+ 
+      tabs.find( ".ui-tabs-nav" ).append( li );
+      tabs.append( "<div style='padding:0' id='" + id + "'><textarea id='code-"+String.fromCharCode(96 +tabCounter)+"' name='code'>" + tabContentHtml + "</textarea></div>" );
+      tabs.tabs( "refresh" );
+      editor=CodeMirror.fromTextArea(document.getElementById("code-"+String.fromCharCode(96 +tabCounter)), {
+        lineNumbers: true,
+        mode: "text/x-csrc",
+        vimMode: true,
+        showCursorWhenSelecting: true,
+	lineWrapping: true,
+    	extraKeys: {
+		"Ctrl-Q": function(cm){
+		  cm.foldCode(cm.getCursor());
+		  console.log("EK:"+cm.hasFocus()); 
+		},
+		"Ctrl-Insert":function(){
+		  addTab();
+		},
+		"Ctrl-Delete":function(){
+		  removeTab();
+		},
+		"F11": function(cm) {
+		  console.log("==== F11 ====");
+		  cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+		  console.log(cm.getOption("fullScreen"));
+		}
+	},
+    	foldGutter: {
+    		rangeFinder: new CodeMirror.fold.combine(CodeMirror.fold.brace, CodeMirror.fold.comment) 
+	},    
+    	gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+	styleActiveLine: true,
+	matchBrackets: true,
+	autofocus:true
+      });
+
+      editors["code-"+String.fromCharCode(96 +tabCounter)]=editor;
+      $("#labels-"+tabCounter).click();
+      editor.doc.setValue('');
+      console.log("==== {{addtab ====");
+      console.log(editor.doc.getValue());
+      console.log("==== addtab}} ====");
+      tabCounter++;
+    }
+ 
+    // addTab button: just opens the dialog
+    $( "#add_tab" )
+      .button()
+      .click(function() {
+       // dialog.dialog( "open" );
+      addTab();
+      });
+function removeTab()
+{
+      console.log("==== {{{removeTab ===");
+      var panelId = currentLabel.attr("href");
+      console.log(panelId);
+      $( panelId ).remove();
+      tabs.tabs( "refresh" );
+      console.log("==== removeTab}}} ===");
+}
+    // close icon: removing the tab on click
+    tabs.delegate( "span.ui-icon-close", "click", function() {
+      console.log("==== {{{close icon ===");
+      var panelId = $( this ).closest( "li" ).remove().attr( "aria-controls" );
+      console.log("#"+panelId);
+      $( "#" + panelId ).remove();
+      tabs.tabs( "refresh" );
+      console.log("==== close icon}}} ===");
+    });
+ 
+    tabs.bind( "keyup", function( event ) {
+      if ( event.altKey && event.keyCode === $.ui.keyCode.BACKSPACE ) {
+        var panelId = tabs.find( ".ui-tabs-active" ).remove().attr( "aria-controls" );
+        $( "#" + panelId ).remove();
+        tabs.tabs( "refresh" );
+      }
+    });
+//tab section end    
+    console.log($( "#labels-1").text());
+    console.log($( "#labels-1").text("hello"));
+    var editors = new Array();
+    var editor;
+    /*
+      var editor = CodeMirror.fromTextArea(document.getElementById("code-a"), {
+        lineNumbers: true,
+        mode: "text/x-csrc",
+        vimMode: true,
+        showCursorWhenSelecting: true,
+	lineWrapping: true,
+    	extraKeys: {
+	"Ctrl-Q": function(cm){
+	  cm.foldCode(cm.getCursor()); 
+	},
+	"Ctrl-Insert":function(){
+	  addTab();
+	},
+	"F11": function(cm) {
+	  console.log("==== F11 ====");
+          cm.setOption("fullScreen", !cm.getOption("fullScreen"));
+	  console.log(cm.getOption("fullScreen"));
+        },
+        "Esc": function(cm) {
+          if (cm.getOption("fullScreen")) cm.setOption("fullScreen", false);
+        }
+	},
+    	foldGutter: {
+    		rangeFinder: new CodeMirror.fold.combine(CodeMirror.fold.brace, CodeMirror.fold.comment) 
+	},    
+    	gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+	styleActiveLine: true,
+	matchBrackets: true,
+	autofocus:true
+      });
+      */
+    //  editors["code-a"]=editor;
+var input = document.getElementById("select");
+  function selectTheme() {
+    var theme = input.options[input.selectedIndex].innerHTML;
+    editor.setOption("theme", theme);
+  }
+  var choice = document.location.search &&
+               decodeURIComponent(document.location.search.slice(1));
+  if (choice) {
+    input.value = choice;
+    editor.setOption("theme", choice);
+  }
+      
+      //read file
+    function readBlob(opt_startByte, opt_stopByte) {
+
+    var files = document.getElementById('files').files;
+    if (!files.length) {
+      alert('Please select a file!');
+      return;
+    }
+
+    var file = files[0];
+    var start = parseInt(opt_startByte) || 0;
+    var stop = parseInt(opt_stopByte) || file.size - 1;
+
+    var reader = new FileReader();
+
+    // If we use onloadend, we need to check the readyState.
+    reader.onloadend = function(evt) {
+      if (evt.target.readyState == FileReader.DONE) { // DONE == 2
+        //document.getElementById('byte_content').textContent = evt.target.result;
+	var ext="";
+	console.log(currentLabel);
+	console.log("when read file , the current label is: "+currentLabel.text());
+	console.log("when read file , the current label is: "+currentLabel.text);
+	currentLabel.text(file.name);
+	ext=file.name.substring(file.name.lastIndexOf('.')+1);
+	console.log(ext);
+	switch(ext)
+	{
+		case "html":
+		case "htm":
+			var mixedMode = {
+			name: "htmlmixed",
+			scriptTypes: [{matches: /\/x-handlebars-template|\/x-mustache/i,
+				       mode: null},
+				      {matches: /(text|application)\/(x-)?vb(a|script)/i,
+				       mode: "vbscript"}]
+		      };
+			editor.setOption("mode",mixedMode);
+			//console.log(editor.doc.getMode().name);
+			break;
+		case "js":
+			editor.setOption("mode","text/javascript");
+			break;
+		case "json":
+			editor.setOption("mode","application/json");
+			break;
+		case "go":
+			editor.setOption("mode","text/x-go");
+			break;
+		case "markdown":
+		case "mdown":
+		case "mkdn":
+		case "md":
+		case "mkd":
+		case "mdwn":
+		case "mdtxt":
+		case "mdtext":
+		case "text":
+			editor.setOption("mode","text/x-markdown");
+			break;
+		case "py":
+			editor.setOption("mode","text/x-python");
+			break;
+		case "xml":
+			editor.setOption("mode","application/xml");
+			break;
+		case "pl":
+			editor.setOption("mode","text/x-perl");
+			break;
+		case "php":
+			editor.setOption("mode","text/x-php");
+			break;
+		case "rb":
+			editor.setOption("mode","text/x-ruby");
+			break;
+		case "tcl":
+			editor.setOption("mode","text/x-tcl");
+			break;
+		case "vb":
+			editor.setOption("mode","text/x-vb");
+			break;
+		case "vbs":
+			editor.setOption("mode","text/vbscript");
+			break;
+		case "cs":
+			editor.setOption("mode","text/x-csharp");
+			break;
+		case "c":
+			editor.setOption("mode","text/x-csrc");
+			break;
+		case "cpp":
+			editor.setOption("mode","text/x-c++src");
+			break;
+		case "java":
+			editor.setOption("mode","text/x-java");
+			break;
+		case "css":
+			editor.setOption("mode","text/css");
+			break;
+	}
+	editor.doc.setValue(evt.target.result);
+        //document.getElementById('byte_range').textContent = 
+        //    ['Read bytes: ', start + 1, ' - ', stop + 1,
+        //     ' of ', file.size, ' byte file'].join('');
+    console.log(document.activeElement);
+      }
+    };
+
+    var blob = file.slice(start, stop + 1);
+    reader.readAsBinaryString(blob);
+	     console.log("2");
+    console.log("==== }}}readBlob ===");
+  }
+  
+    $("#open").click(function() {
+    	$("#files").click();
+    });
+    $("#undo").click(function() {
+	editor.doc.undo();
+	if(editor.doc.historySize().undo==0)$(this).attr("disabled",true);
+    });
+    $("#redo").click(function() {
+	editor.doc.redo();
+	if(editor.doc.historySize().undo==0)$(this).attr("disabled",true);
+    });
+    addTab();
+    document.getElementById("code-a").focus();
+    console.log(document.activeElement);
+    </script>
+
+  </article>
+
