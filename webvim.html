@@ -142,13 +142,15 @@
     <button id="theme">Select a theme</button>
     <button id="select">Select a theme</button>
   </span>
-  <ul id="themeList">
+  <ul id="themeList" style="position:absolute;z-index:110007">
     <li><a href="#">default</a></li>
     <li><a href="#">3024-day</a></li>
     <li><a href="#">3024-night</a></li>
   </ul>
   </div>
+<div>
 
+  </div>
 <input type="file" id="files" name="file" onchange="readBlob(null,null)"/>
 <!--
 <p>Select a theme: <select onchange="selectTheme()" id=select>
@@ -315,7 +317,10 @@ function getCompletions(token, context) {
       icons: {
         primary: "ui-icon-disk"
       }
-    });
+    })
+    .click(function() {
+      download('test.txt', editor.doc.getValue());
+      });
     $( "#undo" ).button({
       text: false,
       icons: {
@@ -352,6 +357,7 @@ function getCompletions(token, context) {
             of: this
           });
           $( document ).one( "click", function() {
+	    console.log(menu);
             menu.hide();
           });
           return false;
@@ -361,7 +367,6 @@ function getCompletions(token, context) {
           .next()
             .hide()
             .menu();
-    
     $( "#file" ).buttonset();
     $( "#edit" ).buttonset();
     $("#themeSet").buttonset();
@@ -403,10 +408,18 @@ function getCompletions(token, context) {
     var currentLabel=$("#labels-1");
     function selectLabel(obj){
 	console.log("==== {{{selectLabel ====");
-        console.log("select label:"+obj.id);
-	console.log(editor);
+        //console.log("select label:"+obj.id);
+	//console.log(editor);
 	editor=editors["code-"+String.fromCharCode(parseInt(obj.id.substring(obj.id.indexOf('-')+1))+96)]
     	currentLabel=$("#"+obj.id);
+	//remove label focus
+	currentLabel.blur();
+	console.log(document.activeElement);
+	console.log("set textarea focus");
+        $(currentLabel.attr("href")+" textarea").focus();
+	console.log("textarea focused");
+	console.log(document.activeElement);
+	console.log($(currentLabel.attr("href")+" textarea"));
 	console.log(currentLabel);
 	console.log(currentLabel.text());
 	console.log($("#labels-1"));
@@ -430,7 +443,7 @@ function getCompletions(token, context) {
         tabContentHtml = "";//tabContent.val() || "Tab " + tabCounter + " content.";
  
       tabs.find( ".ui-tabs-nav" ).append( li );
-      tabs.append( "<div style='padding:0' id='" + id + "'><textarea id='code-"+String.fromCharCode(96 +tabCounter)+"' name='code'>" + tabContentHtml + "</textarea></div>" );
+      tabs.append( "<div style='padding:0' id='" + id + "'><textarea  id='code-"+String.fromCharCode(96 +tabCounter)+"' name='code'>" + tabContentHtml + "</textarea></div>" );
       tabs.tabs( "refresh" );
       editor=CodeMirror.fromTextArea(document.getElementById("code-"+String.fromCharCode(96 +tabCounter)), {
         lineNumbers: true,
@@ -467,6 +480,7 @@ function getCompletions(token, context) {
       editors["code-"+String.fromCharCode(96 +tabCounter)]=editor;
       $("#labels-"+tabCounter).click();
       editor.doc.setValue('');
+      $("#tabs-"+tabCounter+" textarea").focus();
       console.log("==== {{addtab ====");
       console.log(editor.doc.getValue());
       console.log("==== addtab}} ====");
@@ -669,6 +683,12 @@ var input = document.getElementById("select");
 	     console.log("2");
     console.log("==== }}}readBlob ===");
   }
+function download(filename, text) {
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    pom.setAttribute('download', filename);
+    pom.click();
+}
   
     $("#open").click(function() {
     	$("#files").click();
@@ -682,7 +702,9 @@ var input = document.getElementById("select");
 	if(editor.doc.historySize().undo==0)$(this).attr("disabled",true);
     });
     addTab();
-    document.getElementById("code-a").focus();
+  //  document.getElementById("code-a").focus();
+   // console.log(document.activeElement);
+      console.log("....................."); 
     console.log(document.activeElement);
     </script>
 
